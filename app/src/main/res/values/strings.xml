@@ -1,0 +1,43 @@
+<resources>
+    <string name="app_name">MisterVapeShop</string>
+    <string name="product_name">Product Name</string>
+    <string name="price">Price</string>
+    <string name="_1">1</string>
+    <string name="minus">Minus</string>
+    <string name="add_to_cart">Add to cart</string>
+    <string name="add">add</string>
+    <string name="login">Login</string>
+    <string name="password">Password</string>
+    <string name="username">Username</string>
+    <string name="my_cart">My Cart</string>
+    <string name="back">Back</string>
+    <string name="total">Total:</string>
+
+    <string name="check_out">Check Out</string>
+    <string name="s">(</string>
+
+    <string name="a">)</string>
+    <string name="supplier">Supplier</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="checkout_confirmation">Checkout Confirmation</string>
+    <string name="confirm">Confirm</string>
+    <string name="attach">attach</string>
+    <string name="attach_your_payment_reciept">Attach Your Payment reciept</string>
+    <string name="ref_no">Gcash Ref. no</string>
+    <string name="_0">0</string>
+    <string name="items">Items</string>
+    <string name="book_order">book order</string>
+    <string name="reservation_form">Reservation Form</string>
+    <string name="fullname">Fullname</string>
+    <string name="address">Address</string>
+    <string name="contact">Contact</string>
+    <string name="products">Products</string>
+    <string name="expected_date">Expected Date</string>
+    <string name="note">Note</string>
+    <string name="reserve_product">Reserve Product</string>
+    <string name="reserve_now">Reserve now!</string>
+    <string name="already_hav_an_account_login_here">Already hav an account? Login Here!</string>
+    <string name="create_account">Create account</string>
+
+</resources>
