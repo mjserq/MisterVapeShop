@@ -1,6 +1,7 @@
 package com.flysolo.mistervapeshop.adapters;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,6 +23,7 @@ import com.flysolo.mistervapeshop.MainActivity;
 import com.flysolo.mistervapeshop.R;
 import com.flysolo.mistervapeshop.login.LoginActivity;
 import com.flysolo.mistervapeshop.models.Product;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.util.HashMap;
 import java.util.List;
@@ -33,10 +35,14 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.MyViewHo
     private Context mContext;
     private List<Product> products;
     private int orderQuantity = 1;
-
-    public ProductAdapter(Context context, List<Product> products){
+    public interface ProductClickListener {
+        void onProductClick(int position,int quantity);
+    }
+    private ProductClickListener productClickListener;
+    public ProductAdapter(Context context, List<Product> products,ProductClickListener productClickListener){
         this.mContext = context;
         this.products = products;
+        this.productClickListener = productClickListener;
     }
     @NonNull
     @Override
@@ -56,12 +62,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.MyViewHo
             holder.mContainer.setVisibility(View.VISIBLE);
         }
         holder.buttonAddToCart.setOnClickListener(v -> {
-            String uniqueID = UUID.randomUUID().toString();
-            String userID = LoginActivity.username;
-            String productID = products.get(position).getProduct_id();
-            int quantity = orderQuantity;
-            long timestamp = System.currentTimeMillis();
-            addToCart(uniqueID,userID,productID,quantity,timestamp);
+            productClickListener.onProductClick(position,orderQuantity);
         });
         holder.buttonIncrement.setOnClickListener(v -> {
             holder.textQuantity.setText(String.valueOf(incrementQuantity()));
@@ -89,13 +90,14 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.MyViewHo
     private void addToCart(String cartItemID, String userID, String productID, int cartItemQuantity, long timestamp){
         StringRequest request = new StringRequest(Request.Method.POST, "https://blazeproject0033.000webhostapp.com/mobile/addToCart.php",
                 response -> {
-
                     Toast.makeText(mContext, response, Toast.LENGTH_SHORT).show();
-
                 },
                 error ->{
-
-                    Toast.makeText(mContext,error.getMessage(),Toast.LENGTH_SHORT).show();
+                    MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(mContext);
+                    builder.setTitle("Connection Error!")
+                            .setPositiveButton("Refresh", (dialogInterface, i) -> {
+                                dialogInterface.dismiss();
+                            }).show();
                 })
         {
             @Override
