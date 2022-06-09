@@ -140,6 +140,10 @@ public class MainActivity extends AppCompatActivity implements ProductAdapter.Pr
         String uniqueID = UUID.randomUUID().toString();
         String userID = LoginActivity.username;
         Product product = productList.get(position);
-        addToCart(uniqueID,userID,product.getProduct_id(),quantity,System.currentTimeMillis());
+        if (quantity > product.getQty()) {
+            Toast.makeText(binding.getRoot().getContext(),"Quantity is higher than the stocks",Toast.LENGTH_SHORT).show();
+        } else {
+            addToCart(uniqueID,userID,product.getProduct_id(),quantity,System.currentTimeMillis());
+        }
     }
 }
