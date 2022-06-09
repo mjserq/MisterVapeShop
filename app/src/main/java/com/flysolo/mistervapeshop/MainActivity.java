@@ -9,6 +9,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.android.volley.Request;
+import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.flysolo.mistervapeshop.adapters.ProductAdapter;
@@ -17,19 +18,23 @@ import com.flysolo.mistervapeshop.cart.CartActivity;
 import com.flysolo.mistervapeshop.databinding.ActivityMainBinding;
 import com.flysolo.mistervapeshop.login.LoginActivity;
 import com.flysolo.mistervapeshop.models.Product;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements ProductAdapter.ProductClickListener {
     private ActivityMainBinding binding;
     private ProductAdapter adapter;
     public static List<Product> productList;
     private static final String BASE_URL = "https://blazeproject0033.000webhostapp.com/mobile/getProducts.php";
-
+    private int orderQuantity = 1;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -66,6 +71,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void getProducts (){
+        productList.clear();
         binding.progressbar.setVisibility(View.VISIBLE);
         StringRequest stringRequest = new StringRequest(Request.Method.GET, BASE_URL,
                 response -> {
@@ -87,14 +93,53 @@ public class MainActivity extends AppCompatActivity {
                     }catch (Exception e){
                         e.printStackTrace();
                     }
-                    adapter = new ProductAdapter(this,productList);
+                    adapter = new ProductAdapter(this,productList,this);
                     binding.productsRecyclerView.setAdapter(adapter);
                 }, error -> {
             binding.progressbar.setVisibility(View.GONE);
-            Toast.makeText(this, error.toString(),Toast.LENGTH_LONG).show();
+            MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
+            builder.setTitle("Connection Error!")
+                    .setPositiveButton("Refresh", (dialogInterface, i) -> {
+                        getProducts();
+                    }).show();;
 
         });
         Volley.newRequestQueue(this).add(stringRequest);
     }
+    private void addToCart(String cartItemID, String userID, String productID, int cartItemQuantity, long timestamp){
+        StringRequest request = new StringRequest(Request.Method.POST, "https://blazeproject0033.000webhostapp.com/mobile/addToCart.php",
+                response -> {
+                    Toast.makeText(this, response, Toast.LENGTH_SHORT).show();
+                },
+                error ->{
+                    MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
+                    builder.setTitle("Connection Error!")
+                            .setPositiveButton("Refresh", (dialogInterface, i) -> {
+                                getProducts();
+                            }).show();
+                })
+        {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String,String> map= new HashMap<>();
+                map.put("cartItemID",cartItemID);
+                map.put("userID",userID);
+                map.put("productID",productID);
+                map.put("cartItemQuantity",String.valueOf(cartItemQuantity));
+                map.put("timestamp",String.valueOf(timestamp));
+                return map;
+            }
+        };
+        RequestQueue queue= Volley.newRequestQueue(this);
+        queue.add(request);
+    }
 
+
+    @Override
+    public void onProductClick(int position, int quantity) {
+        String uniqueID = UUID.randomUUID().toString();
+        String userID = LoginActivity.username;
+        Product product = productList.get(position);
+        addToCart(uniqueID,userID,product.getProduct_id(),quantity,System.currentTimeMillis());
+    }
 }
